@@ -24,8 +24,9 @@ var options = {};
 // Specify options. Returned fields and format
 options.fields = ['p12_pop1824', 'p12_pop2539', 'p12_pop4054', 'geometry']
 options.format = MyPlaceAPIHelper.GEOJSON
+var id = '1';
 // Result is a Promise
-var promise = api.requestResourceById(MyPlaceAPIHelper.IRIS, '1', options)
+var promise = api.requestResourceById(MyPlaceAPIHelper.IRIS, id, options)
 promise.then(function(response){
     console.log(response);
 }).catch(function(error){
