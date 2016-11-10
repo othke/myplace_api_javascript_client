@@ -3,4 +3,5 @@ node_modules
 
 # Built by webpack
 bundle.js
+bundle.js.map
 
