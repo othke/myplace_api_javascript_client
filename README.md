@@ -100,4 +100,9 @@ var options_shop = {apihelper: api, resource: MyPlaceAPIHelper.SHOP, request:MyP
      minScale: 18, maxScale:19}
 shop_layer = new MyPlaceMapLayer(options_shop)
 mymap.addLayer(shop_layer)
+
+// To apply a symbology to the cell analysis
+// The array of color is optional. A default color ramp is used if empty
+var func = MyPlaceMapLayer.getCellAnalysisGradient("nb_b304", ['#a50026','#d73027','#f46d43','#fdae61','#fee08b','#d9ef8b','#a6d96a','#66bd63','#1a9850','#006837'])
+layer_cell_analysis.defineGradientStyle(func)
 ```
