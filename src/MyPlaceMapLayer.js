@@ -150,11 +150,11 @@ class MyPlaceMapLayer extends L.GeoJSON {
             // request data
             var api = this.options.apihelper;
             var resource = this.options.resource;
-            var xmin = mymap.getBounds()._southWest.lng;
-            var ymin = mymap.getBounds()._southWest.lat;
-            var xmax = mymap.getBounds()._northEast.lng;
-            var ymax = mymap.getBounds()._northEast.lat
-            var zlevel = mymap.getZoom()
+            var xmin = this._map.getBounds()._southWest.lng;
+            var ymin = this._map.getBounds()._southWest.lat;
+            var xmax = this._map.getBounds()._northEast.lng;
+            var ymax = this._map.getBounds()._northEast.lat
+            var zlevel = this._map.getZoom()
 
             // zoom request limit
             if (zlevel < 14) {
@@ -186,15 +186,15 @@ class MyPlaceMapLayer extends L.GeoJSON {
             }
 
             // request data
-            var xmin = mymap.getBounds()._southWest.lng;
-            var ymin = mymap.getBounds()._southWest.lat;
-            var xmax = mymap.getBounds()._northEast.lng;
-            var ymax = mymap.getBounds()._northEast.lat
-            var zlevel = mymap.getZoom()
+            var xmin = this._map.getBounds()._southWest.lng;
+            var ymin = this._map.getBounds()._southWest.lat;
+            var xmax = this._map.getBounds()._northEast.lng;
+            var ymax = this._map.getBounds()._northEast.lat
+            var zlevel = this._map.getZoom()
 
             api.requestGeoIntersectsResources(this.options.resource, xmin, ymin, xmax, ymax).then(
                 function (data) {
-                    this.clearLayers();
+                    //this.clearLayers();
                     this.addData(data);
                 }.bind(this));
         }
