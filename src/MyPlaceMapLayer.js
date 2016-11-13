@@ -113,11 +113,9 @@ class MyPlaceMapLayer extends L.GeoJSON {
         }
         // make color func
         var colorFunc = function (v) {
-            console.log('color')
             var step = 1 / colors.length
             var color_indice = Math.round(v / step) - 1
             color_indice = color_indice < 0 ? 0 : color_indice;
-            console.log(step)
             return colors[color_indice]
         }
 
