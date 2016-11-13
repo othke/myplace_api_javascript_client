@@ -35,9 +35,9 @@ mymap.addLayer(window.layer_cell_analysis)
 // Transportation layer
 var options_transportation = {}
 var options_transportation = {apihelper: api, resource: MyPlaceAPIHelper.TRANSPORTATION, request:MyPlaceMapLayer.resourceRequest(),
-     minScale: 16, maxScale:19}
+     minScale: 17, maxScale:19}
 window.transportation_layer = new MyPlaceMapLayer(options_transportation)
-// mymap.addLayer(window.transportation_layer)
+mymap.addLayer(window.transportation_layer)
 
 // Shop layer
 var options_shop = {}

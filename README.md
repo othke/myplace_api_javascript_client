@@ -71,3 +71,33 @@ promise.then(function(response){
     console.log(error);
 })
 ```
+
+### Add Layer to Map
+
+* API provide a MyPlaceMapLayer for display resource from the API on the map (Point, Polyline, Polygon)
+
+```js
+// Set the API
+var api = new window.MyPlaceAPIHelper(url);
+
+// Cell analysis layer
+// request options specify the request methods to use to get data from the resource. there is static methods in MyPlaceMapLayer
+var options_cell_analysis = {}
+var options_cell_analysis = {apihelper: api, resource: MyPlaceAPIHelper.CELL_ANALYSIS, request:MyPlaceMapLayer.cellAnalysisRequest()}
+var layer_cell_analysis = new MyPlaceMapLayer(options_cell_analysis)
+mymap.addLayer(layer_cell_analysis)
+
+// Transportation layer
+var options_transportation = {}
+var options_transportation = {apihelper: api, resource: MyPlaceAPIHelper.TRANSPORTATION, request:MyPlaceMapLayer.resourceRequest(),
+     minScale: 17, maxScale:19}
+var transportation_layer = new MyPlaceMapLayer(options_transportation)
+mymap.addLayer(transportation_layer)
+
+// Shop layer
+var options_shop = {}
+var options_shop = {apihelper: api, resource: MyPlaceAPIHelper.SHOP, request:MyPlaceMapLayer.resourceRequest(),
+     minScale: 18, maxScale:19}
+shop_layer = new MyPlaceMapLayer(options_shop)
+mymap.addLayer(shop_layer)
+```
