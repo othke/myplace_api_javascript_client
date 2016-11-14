@@ -46,14 +46,14 @@ class MyPlaceAPIHelper {
      */
 
     /**
-     * Get a spatial intersect argument
+     * Get a spatial intersect extent argument
      * @param {number} xmin - xmin coordinate
      * @param {number} ymin - ymin coordinate
      * @param {number} xmax - xmax coordinate
      * @param {number} ymax - ymax coordinate
      * @return {Object} GeoIntersect argument
      */
-    getGeoIntersectsSpatialArg(xmin, ymin, xmax, ymax) {
+    getGeoIntersectExtentSpatialArg(xmin, ymin, xmax, ymax) {
         // Coordinates BBOX of the map
         var coordinates = []
         coordinates.push([xmin, ymin])
@@ -67,6 +67,27 @@ class MyPlaceAPIHelper {
             coordinates: [coordinates]
         }
 
+        var geoIntersectsSpatialArg = {
+            geometry: {
+                $geoIntersects: {
+                    $geometry: geometry
+                }
+            }
+        }
+        return geoIntersectsSpatialArg
+    }
+
+        /**
+     * Get a spatial intersect point argument
+     * @param {number} x - x coordinate
+     * @param {number} y - y coordinate
+     * @return {Object} GeoIntersect argument
+     */
+    getGeoIntersectPointSpatialArg(x, y) {
+        var geometry = {
+            type: "Point",
+            coordinates: [x, y]
+        }
         var geoIntersectsSpatialArg = {
             geometry: {
                 $geoIntersects: {
@@ -208,16 +229,37 @@ class MyPlaceAPIHelper {
      * @param {number} options.minDistance - minimum search distance (default = 0)
      * @param {number} options.maxDistance - maximum search distance (default = 500)
      * @param {string} options.format - return format (deafut = geojson)
-     * @return {Object} nearShop argument
+     * @return {Promise} resource promise
      */
-    requestGeoIntersectsResources(resource, xmin, ymin, xmax, ymax, options) {
+    requestGeoIntersectExtentResources(resource, xmin, ymin, xmax, ymax, options) {
         // Prepare format arguments
         var options = options || {}
         options.format = options.format || MyPlaceAPIHelper.GEOJSON
 
         // Prepare where argument
-        var geoIntersectsSpatialArg = this.getGeoIntersectsSpatialArg(xmin, ymin, xmax, ymax);
-        options.where = geoIntersectsSpatialArg
+        var geoIntersectExtentSpatialArg = this.getGeoIntersectExtentSpatialArg(xmin, ymin, xmax, ymax);
+        options.where = geoIntersectExtentSpatialArg
+
+        return this.requestResources(resource, options)
+    }
+
+    /**
+     * Request the MyPlace API to get the intersect point Resources
+     * @param {string} resource - name of the resource. Use static properties of MyPlaceAPIHelper
+     * @param {number} x - x coordinate
+     * @param {number} y - y coordinate
+     * @param {Object} options - extra options
+     * @param {string} options.format - return format (deafut = geojson)
+     * @return {Promise} resource promise
+     */
+    requestGeoIntersectPointResources(resource, x, y, options) {
+        // Prepare format arguments
+        var options = options || {}
+        options.format = options.format || MyPlaceAPIHelper.GEOJSON
+
+        // Prepare where argument
+        var geoIntersectPointSpatialArg = this.getGeoIntersectPointSpatialArg(x, y);
+        options.where = geoIntersectPointSpatialArg
 
         return this.requestResources(resource, options)
     }
@@ -231,7 +273,7 @@ class MyPlaceAPIHelper {
      * @param {number} options.minDistance - minimum search distance (default = 0)
      * @param {number} options.maxDistance - maximum search distance (default = 500)
      * @param {string} options.format - return format (deafut = geojson)
-     * @return {Object} nearShop argument
+     * @return {Promise} near resource promise
      */
     requestGeoNearResources(resource, x, y, options) {
         // Prepare format arguments
@@ -257,7 +299,7 @@ class MyPlaceAPIHelper {
      * Get all the code shop
      * @return {Object} JSON object representing the description of type of shop
      */
-    requestShopType(){
+    requestShopType() {
         return this.requestResources(MyPlaceAPIHelper.SHOP_TYPE)
     }
 
@@ -270,7 +312,7 @@ class MyPlaceAPIHelper {
      * @param {number} options.minDistance - minimum search distance (default = 0)
      * @param {number} options.maxDistance - maximum search distance (default = 500)
      * @param {string} options.format - return format (deafut = geojson)
-     * @return {Object} nearShop argument
+     * @return {Promise} nearShop promise
      */
     requestNearShopByType(x, y, code_shop, options) {
 
@@ -291,6 +333,52 @@ class MyPlaceAPIHelper {
     }
 
     /**
+     * Request the MyPlace API to get the Near Transportation
+     * @param {number} x - x coordinate
+     * @param {number} y - y coordinate
+     * @param {Object} options - extra options
+     * @param {number} options.minDistance - minimum search distance (default = 0)
+     * @param {number} options.maxDistance - maximum search distance (default = 500)
+     * @param {string} options.format - return format (deafut = geojson)
+     * @return {Promise} nearTransporation promise
+     */
+    requestNearTransportation(x, y, options) {
+        // Prepare format arguments
+        var options = options || {}
+        options.format = options.format || MyPlaceAPIHelper.GEOJSON
+
+        // Prepare where argument
+        var minDistance = options.minDistance || 0
+        var maxDistance = options.maxDistance || 500
+        var geoNearSpatialArg = this.getGeoNearSpatialArg(x, y, minDistance, maxDistance);
+        options.where = geoNearSpatialArg
+
+        return this.requestResources(MyPlaceAPIHelper.TRANSPORTATION, options)
+    }
+
+    /**
+     * Request the MyPlace API to get the Iris by point
+     * @param {number} x - x coordinate
+     * @param {number} y - y coordinate
+     * @param {Object} options - extra options
+     * @param {string} options.format - return format (deafut = geojson)
+     * @return {Promise} iris by point promise
+     */
+    requestIrisByPoint(x, y, options){
+        // Prepare format arguments
+        var options = options || {}
+        options.format = options.format || MyPlaceAPIHelper.GEOJSON
+
+        // Prepare where argument
+        var minDistance = options.minDistance || 0
+        var maxDistance = options.maxDistance || 500
+        var geoIntersectPointSpatialArg = this.getGeoIntersectPointSpatialArg(x, y);
+        options.where = geoIntersectPointSpatialArg
+
+        return this.requestResources(MyPlaceAPIHelper.IRIS, options)
+    }
+
+    /**
      * Request the Place analysis 
      * @param {number} xmin - xmin coordinate
      * @param {number} ymin - ymin coordinate
@@ -307,12 +395,17 @@ class MyPlaceAPIHelper {
         options.format = options.format || MyPlaceAPIHelper.GEOJSON
 
         // Prepare where argument
-        var zLevelArg = {z: zlevel.toString()}
-        var geoIntersectsSpatialArg = this.getGeoIntersectsSpatialArg(xmin, ymin, xmax, ymax)
-        var requestArg = this.getAndArg(zLevelArg, geoIntersectsSpatialArg) 
+        var zLevelArg = { z: zlevel.toString() }
+        var geoIntersectsSpatialArg = this.getGeoIntersectExtentSpatialArg(xmin, ymin, xmax, ymax)
+        var requestArg = this.getAndArg(zLevelArg, geoIntersectsSpatialArg)
         options.where = requestArg
 
         return this.requestResources(MyPlaceAPIHelper.CELL_ANALYSIS, options)
+    }
+
+    requestCellAnalysisInfoEnvironment(feature){
+        feature
+
     }
 }
 
@@ -333,5 +426,88 @@ MyPlaceAPIHelper.CELL_ANALYSIS = "cell_analysis";
 MyPlaceAPIHelper.JSON = "json";
 MyPlaceAPIHelper.GEOJSON = "geojson";
 
+// Dictionnary
+MyPlaceAPIHelper.CODE_SHOP_DICT = {
+    "NB_B301": "Librairie papeterie journaux"
+    , "NB_B302": "Magasin de vêtements"
+    , "NB_B304": "Magasin de chaussures"
+    , "NB_B307": "Magasin d'articles de sports et de loisirs"
+    , "NB_B312": "Fleuriste"
+    , "NB_B202": "Epicerie"
+    , "NB_B203": "Boulangerie"
+    , "NB_B204": "Boucherie"
+    , "NB_B206": "Poissonnerie"
+    , "NB_B311": "Horlogerie - Bijouterie"
+    , "NB_A506": "Blanchisserie-Teinturerie"
+    , "NB_A504": "Restaurant"
+    , "NB_B310": "Parfumerie"
+    , "NB_A501": "Coiffure"
+    , "NB_A507": "Soins de beauté"
+}
+
+MyPlaceAPIHelper.CODE_TRANSPORTATION_DICT = {
+    "code_type_transportation": "Type de transport",
+    "name_transporation": "Nom de l'arrêt"
+}
+
+MyPlaceAPIHelper.CODE_TYPE_TRANSPORTATION_DICT = {
+    '1': 'Gare SNCF - RER',
+    '2': 'Station de métro',
+    '5': 'Arrêt de bus',
+    '6': 'Arrêt de tramway'
+}
+
+MyPlaceAPIHelper.IRIS_DICT = {
+    "code_iris" : "Code IRIS",
+    "reg" : "Code Région de référence",
+    "reg2016" : "Code Région de référence 2016",
+    "dep" : "Code Département",
+    "uu2010" : "Code Unité Urbaine",
+    "com" : "Code Commune",
+    "libcom" : "Commune",
+    "triris" : "Code TRIRIS",
+    "grd_quart" : "Code Grand Quartier",
+    "libiris" : "Nom de l'IRIS",
+    "typ_iris" : "Code type IRIS",
+    "modif_iris" : "Modification IRIS",
+    "lab_iris" : "Lab IRIS",
+    "pop" : "Population",
+    "c12_men_cs1" : "Agriculteur exploitant",
+    "c12_men_cs2" : "Artisan, Commerçant, Chef d'entreprise",
+    "c12_men_cs3" : "Cadre ou exerce une Profession intellectuelle supérieure",
+    "c12_men_cs4" : "Profession intermédiaire",
+    "c12_men_cs5" : "Employé",
+    "c12_men_cs6" : "Ouvrier",
+    "c12_men_cs7" : "Retraité",
+    "c12_men_cs8" : "Autre sans activité professionnelle",
+    "c12_coupaenf" : "Couple avec enfant(s)",
+    "c12_fammono" : "famille monoparentale",
+    "c12_coupsenf" : "Couple sans enfant",
+    "c12_menpseul" : "Personne seul",
+    "c12_mensfam" : "Autres sans famille",
+    "p12_pop1824" : "Age de 18 à 24 ans",
+    "p12_pop2539" : "Age de 25 à 39 ans",
+    "p12_pop4054" : "Age de 40 à 54 ans",
+    "p12_pop5564" : "Age de 55 à 64 ans",
+    "p12_pop6579" : "Age de 65 à 79 ans",
+    "p12_pop80p" : "Age plus de 80 ans",
+    "p12_rp_prop" : "Propriétaires",
+    "p12_rp_loc" : "Locataires",
+    "nb_b202" : "Epicerie",
+    "nb_b203" : "Boulangerie",
+    "nb_b204" : "Boucherie",
+    "nb_b206" : "Poissonerie",
+    "nb_b301" : "Librairie papeterie journaux",
+    "nb_b302" : "Magasin de vêtements",
+    "nb_b304" : "Magasin de chaussures",
+    "nb_b307" : "Magasin d'articles de sports et de loisirs",
+    "nb_b310" : "Parfumerie",
+    "nb_b311" : "Horlogerie - Bijouterie",
+    "nb_b312" : "Fleuriste",
+    "nb_a501" : "Coiffure",
+    "nb_a504" : "Restaurant",
+    "nb_a506" : "Blanchisserie-Teinturerie",
+    "nb_a507" : "Soins de beauté"
+}
 
 export default MyPlaceAPIHelper;

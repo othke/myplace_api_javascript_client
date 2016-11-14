@@ -23,6 +23,10 @@ class MyPlaceMapLayer extends L.GeoJSON {
 
         // Symbology field properties
         this.symbologyField = undefined
+
+        // Custom Event
+        this.loadingStartEvent = new Event('loadingStart');
+        this.loadingEndEvent = new Event('loadingEnd');
     }
 
     /**
@@ -90,7 +94,9 @@ class MyPlaceMapLayer extends L.GeoJSON {
      * @param {[]} colors
      */
     defineGradientStyle(func) {
+        // Fix because setStyle does not work correctly without set the options.style before
         this.options.style = func.bind(this);
+        this.setStyle(this.options.style)
 
     }
 
@@ -98,7 +104,9 @@ class MyPlaceMapLayer extends L.GeoJSON {
      * Define symbology for Marker
      */
     defineMarkerStyle(func) {
-        this.options.pointToLayer = func.bind(this);
+        // Fix because setStyle does not work correctly without set the options.style before
+        this.options.style = func.bind(this);
+        this.setStyle(this.options.style)
     }
 
     /**
@@ -122,7 +130,7 @@ class MyPlaceMapLayer extends L.GeoJSON {
         // make style func
         var style = function (feature) {
             return {
-                fillColor: colorFunc(feature.properties[symbologyField]), 
+                fillColor: colorFunc(feature.properties[symbologyField]),
                 weight: 2,
                 opacity: 1,
                 color: 'white',
@@ -155,18 +163,24 @@ class MyPlaceMapLayer extends L.GeoJSON {
             var xmax = this._map.getBounds()._northEast.lng;
             var ymax = this._map.getBounds()._northEast.lat
             var zlevel = this._map.getZoom()
-
-            // zoom request limit
-            if (zlevel < 14) {
-                zlevel = 14
+            
+            var zlevelMin = 14;
+            var zlevelMax = 18;
+            // defaut zoom level
+            if (zlevel < zlevelMin) {
+                this.clearLayers()
+                return
             }
-            if (zlevel > 17) {
-                zlevel = 17
+            if (zlevel > zlevelMax) {
+                zlevel = zlevelMax
             }
+            zlevel = 17
+            dispatchEvent(this.loadingStartEvent)
             api.requestCellAnalysisByExtent(xmin, ymin, xmax, ymax, zlevel).then(
                 function (data) {
                     this.clearLayers();
                     this.addData(data);
+                    dispatchEvent(this.loadingEndEvent)
                 }.bind(this));
         }
     }
@@ -192,12 +206,35 @@ class MyPlaceMapLayer extends L.GeoJSON {
             var ymax = this._map.getBounds()._northEast.lat
             var zlevel = this._map.getZoom()
 
-            api.requestGeoIntersectsResources(this.options.resource, xmin, ymin, xmax, ymax).then(
+            dispatchEvent(this.loadingStartEvent)
+            api.requestGeoIntersectExtentResources(this.options.resource, xmin, ymin, xmax, ymax).then(
                 function (data) {
-                    //this.clearLayers();
+                    this.clearLayers();
                     this.addData(data);
+                    dispatchEvent(this.loadingEndEvent)
                 }.bind(this));
         }
+    }
+
+
+    static wgs84ToTms (lon, lat, zoom) {
+        var lat_rad = lat * (Math.PI / 180);
+        var n = Math.pow(2.0, zoom);
+        var xtile = parseInt((lon + 180.0) / 360.0 * n);
+        var ytile = parseInt((1.0 - Math.log(Math.tan(lat_rad) + (1 / Math.cos(lat_rad))) / Math.PI) / 2.0 * n)
+        return [xtile, ytile, zoom]
+    }
+
+    static extentToTms (xmin, ymin, xmax, ymax, zoom) {
+        var tiles = [];
+        var topLeft = wgs84ToTms(xmin, ymax, zoom);
+        var bottomRight = wgs84ToTms(xmax, ymax, zoom);
+        for (var xTile = topLeft[0]; xTile <= bottomRight[0]; xTile++) {
+            for (var yTile = topLeft[1]; yTile <= bottomRight[1]; yTile++) {
+                tiles.push({ x: xTile, y: yTile, z: zoom })
+            }
+        }
+        return tiles
     }
 
 }
