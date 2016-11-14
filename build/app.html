@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Bootstrap Case</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="app.css" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">MyPlace</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1 <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Page 1-1</a></li>
+            <li><a href="#">Page 1-2</a></li>
+            <li><a href="#">Page 1-3</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Page 2</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <form>
+            <div class="form-group">
+              <select id="shop-id" class="form-control">
+              <option selected>Choisir le type de commerce</option>
+              <option value="NB_B301">Librairie papeterie journaux</option>
+              <option value="NB_B302">Magasin de vêtements</option>
+              <option value="NB_B304">Magasin de chaussures</option>
+              <option value="NB_B307">Magasin d'articles de sports et de loisirs</option>
+              <option value="NB_B312">Fleuriste</option>
+              <option value="NB_B202">Epicerie</option>
+              <option value="NB_B203">Boulangerie</option>
+              <option value="NB_B204">Boulangerie</option>
+              <option value="NB_B206">Poissonnerie</option>
+              <option value="NB_B311">Horlogerie - Bijouterie</option>
+              <option value="NB_A506">Blanchisserie-Teinturerie</option>
+              <option value="NB_A504">Restaurant</option>
+              <option value="NB_B310">Parfumerie</option>
+              <option value="NB_A501">Coiffure</option>
+              </select>
+            </div>
+          </form>
+        </li>
+      </ul>
+
+    </div>
+  </nav>
+
+  <div id="map"></div>
+  <div id="loading">
+    <img src="loader.gif"/>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+  <script src="bundle.js"></script>
+</body>
+
+</html>
